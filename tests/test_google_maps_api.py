@@ -92,3 +92,25 @@ class TestPlace():
         Checking.check_status_code(result, 404)
         Checking.check_json_fields(result, ['msg'])
         Checking.check_json_value(result, 'msg', "Update address operation failed, looks like the data doesn't exists")
+
+    @allure.title("Проверка удаления локации")
+    def test_delete_location(self):
+        """Проверка данных новой локации"""
+        result = GoogleMapsApi.create_new_place(self.json_for_tests)
+        Checking.check_status_code(result, 200)
+        place_id = result.json().get('place_id')
+        result = GoogleMapsApi.delete_new_place(place_id)
+        Checking.check_status_code(result, 200)
+        Checking.check_json_fields(result, ['status'])
+        Checking.check_json_value(result, 'status', "OK")
+        result = GoogleMapsApi.get_new_place(place_id)
+        Checking.check_status_code(result, 404)
+
+    @allure.title("Проверка удаления несуществующей локации")
+    def test_delete_location_not_in_list(self):
+        """Проверка данных новой локации"""
+        place_id = '0'
+        result = GoogleMapsApi.delete_new_place(place_id)
+        Checking.check_status_code(result, 404)
+        Checking.check_json_fields(result, ['msg'])
+        Checking.check_json_value(result, 'msg', "Delete operation failed, looks like the data doesn't exists")
